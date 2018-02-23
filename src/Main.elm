@@ -1,19 +1,28 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (src)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 ---- MODEL ----
 
 
 type alias Model =
-    {}
+    { total : Int
+    , userInput : String
+    , error : Maybe String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
+    ( { total = 0
+      , userInput = ""
+      , error = Nothing
+      }
+    , Cmd.none
+    )
 
 
 
@@ -21,12 +30,33 @@ init =
 
 
 type Msg
-    = NoOp
+    = AddCalorie
+    | Clear
+    | UserInput String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        AddCalorie ->
+            ( { model | total = model.total + 1 }, Cmd.none )
+
+        Clear ->
+            ( { model | total = 0 }, Cmd.none )
+
+        UserInput val ->
+            case String.toInt val of
+                Ok input ->
+                    ({ model
+                        | total = input
+                        , error = Nothing
+                    }, Cmd.none)
+
+                Err err ->
+                    ({ model
+                        | total = 0
+                        , error = Just err
+                    }, Cmd.none)
 
 
 
@@ -36,8 +66,21 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src "/logo.svg" ] []
-        , div [] [ text "Your Elm App is working!" ]
+        [ h3 []
+            [ text ("Total Calories: " ++ (toString model.total)) ]
+        , input
+            [ type_ "number", onInput UserInput ]
+            []
+        , button
+            [ type_ "button"
+            , onClick AddCalorie
+            ]
+            [ text "Add" ]
+        , button
+            [ type_ "button"
+            , onClick Clear
+            ]
+            [ text "Clear" ]
         ]
 
 
