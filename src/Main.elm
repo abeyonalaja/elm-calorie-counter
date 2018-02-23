@@ -47,16 +47,20 @@ update msg model =
         UserInput val ->
             case String.toInt val of
                 Ok input ->
-                    ({ model
+                    ( { model
                         | total = input
                         , error = Nothing
-                    }, Cmd.none)
+                      }
+                    , Cmd.none
+                    )
 
                 Err err ->
-                    ({ model
+                    ( { model
                         | total = 0
                         , error = Just err
-                    }, Cmd.none)
+                      }
+                    , Cmd.none
+                    )
 
 
 
@@ -71,6 +75,7 @@ view model =
         , input
             [ type_ "number", onInput UserInput ]
             []
+        , div [] [ text (Maybe.withDefault "" model.error)]
         , button
             [ type_ "button"
             , onClick AddCalorie
